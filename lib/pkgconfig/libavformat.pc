@@ -1,0 +1,12 @@
+libdir=./lib
+includedir=./include
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 62.0.102
+Requires: 
+Requires.private: libavcodec >= 62.3.101, libswresample >= 6.0.100, libavutil >= 60.2.100
+Conflicts:
+Libs: -L${libdir}  -lavformat 
+Libs.private: -lm -latomic -lbz2 -lz -lgnutls -lgmp -lunistring -latomic -lnettle -lhogweed -lgmp -lnettle -ltasn1 -lidn2 -lunistring -lp11-kit -lsrt -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc -lssl -ldl -pthread -lcrypto -ldl -pthread -lcrypto -ldl -pthread
+Cflags: -I${includedir}
