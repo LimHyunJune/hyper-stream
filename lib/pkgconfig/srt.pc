@@ -1,5 +1,5 @@
-libdir=./lib
-includedir=./include
+libdir=${pcfiledir}/../../lib
+includedir=${pcfiledir}/../../inc
 
 Name: srt
 Description: SRT library set

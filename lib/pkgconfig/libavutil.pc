@@ -1,5 +1,5 @@
-libdir=./lib
-includedir=./include
+libdir=${pcfiledir}/../../lib
+includedir=${pcfiledir}/../../inc
 
 Name: libavutil
 Description: FFmpeg utility library
