@@ -1,0 +1,11 @@
+libdir=${pcfiledir}/../../lib
+includedir=${pcfiledir}/../../inc
+
+Name: SvtAv1Enc
+Description: SVT (Scalable Video Technology) for AV1 encoder library
+Version: 3.0.2
+Requires.private: 
+Libs: -L${libdir} -lSvtAv1Enc
+Libs.private: -lpthread -lm
+Cflags: -I${includedir}/svt-av1 -DEB_DLL
+Cflags.private: -UEB_DLL
