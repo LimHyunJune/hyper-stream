@@ -1,5 +1,5 @@
-libdir=${pcfiledir}/../../lib
-includedir=${pcfiledir}/../../inc
+libdir=./lib
+includedir=./inc
 
 Name: libswresample
 Description: FFmpeg audio resampling library
