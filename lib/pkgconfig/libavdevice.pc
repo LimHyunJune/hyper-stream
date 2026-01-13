@@ -1,5 +1,5 @@
-libdir=${pcfiledir}/../../lib
-includedir=${pcfiledir}/../../inc
+libdir=./lib
+includedir=./inc
 
 Name: libavdevice
 Description: FFmpeg device handling library
