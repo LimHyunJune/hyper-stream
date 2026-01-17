@@ -1,8 +1,10 @@
 #include <iostream>
+#include "Logger.h"
+
 
 using namespace std;
 
 int main()
 {
-    cout << "test" << endl;
+    BOOST_LOG(debug) << "Test";
 }
