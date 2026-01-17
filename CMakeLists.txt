@@ -42,7 +42,8 @@ pkg_check_modules(SWRESAMPLE REQUIRED libswresample)
 pkg_check_modules(SWSCALE REQUIRED libswscale)
 pkg_check_modules(VMAF REQUIRED libvmaf)
 pkg_check_modules(SRT REQUIRED srt)
-find_package(Boost COMPONENTS log REQUIRED) # BOOST는 시스템에 설치 
+find_package(Boost COMPONENTS log log_setup REQUIRED) # BOOST는 시스템에 설치 
+add_definitions(-DBOOST_LOG_DYN_LINK) 
 
 
 include_directories(
@@ -55,7 +56,7 @@ include_directories(
     ${SWSCALE_INCLUDE_DIRS}
     ${VMAF_INCLUDE_DIRS}
     ${SRT_INCLUDE_DIRS}
-    ${HEADER_FILES}
+    ${HEADER_FILE}
     ${Boost_INCLUDE_DIRS}
   )
 
