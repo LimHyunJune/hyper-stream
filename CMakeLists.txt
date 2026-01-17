@@ -14,9 +14,8 @@ list(APPEND SOURCE_FILE
     "${CMAKE_SOURCE_DIR}/src/modules/codec/src/VideoDecoder.cpp"
     "${CMAKE_SOURCE_DIR}/src/modules/codec/src/VideoEncoder.cpp"
     "${CMAKE_SOURCE_DIR}/src/modules/ingest/src/MediaSource.cpp"
-    "${CMAKE_SOURCE_DIR}/src/modules/processing/src/MultiviewCompositor.cpp"
+    "${CMAKE_SOURCE_DIR}/src/modules/process/src/MultiviewCompositor.cpp"
     "${CMAKE_SOURCE_DIR}/src/modules/transport/src/MediaSink.cpp"
-    "${CMAKE_SOURCE_DIR}/src/utils/src/Channel.cpp"
     "${CMAKE_SOURCE_DIR}/src/utils/src/Logger.cpp"
 )
 
@@ -25,9 +24,10 @@ list(APPEND HEADER_FILE
     "${CMAKE_SOURCE_DIR}/src/core/inc"
     "${CMAKE_SOURCE_DIR}/src/modules/codec/inc"
     "${CMAKE_SOURCE_DIR}/src/modules/ingest/inc"
-    "${CMAKE_SOURCE_DIR}/src/modules/processing/inc"
+    "${CMAKE_SOURCE_DIR}/src/modules/process/inc"
     "${CMAKE_SOURCE_DIR}/src/modules/transport/inc"
     "${CMAKE_SOURCE_DIR}/src/utils/inc"
+    "${CMAKE_SOURCE_DIR}/src/common/inc"
 )
 
 
