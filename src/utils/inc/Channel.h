@@ -27,11 +27,11 @@ class Channel
     public:
         Channel()
         {
-            if constexpr (std::is_same<T, AVPacketPtr>::value)
+            if constexpr (std::is_same_v<T, AVPacketPtr>)
             {
                 capacity = -1;
             }
-            else if constexpr (std::is_same<T, AVFramePtr>::value)
+            else if constexpr (std::is_same_v<T, AVFramePtr>)
             {
                 capacity = 50;
             }
