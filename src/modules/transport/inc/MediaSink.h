@@ -1,11 +1,18 @@
 #pragma once
 
-class IMediaSink {
-public:
-    IMediaSink() = default;
-    ~IMediaSink() = default;
+#include "IMediaSink.h"
 
-    virtual bool initialize(shared_ptr<Channel<AVPacketPtr>> src) = 0;
-    virtual void run() = 0;
-    virtual void stop() = 0;
+class MediaSink final : public IMediaSink{
+
+private:
+    AVFormatContext* output_ctx = nullptr;
+    bool is_stop = false;
+    AVStream* stream = nullptr;
+public:
+    MediaSink() = default;
+    ~MediaSink();
+
+    virtual bool initialize(MediaSinkParam& param, shared_ptr<Channel<AVPacketPtr>> src) override;
+    virtual void run() override;
+    virtual void stop() override;
 };

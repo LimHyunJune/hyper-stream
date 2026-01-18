@@ -50,13 +50,13 @@ class Channel
             not_empty.notify_one();
         }
 
-        T pop() {
+        bool pop(T& item) {
             std::unique_lock<std::mutex> lock(mutex);
             not_empty.wait(lock, [this]{ return is_stop || !queue.empty(); });
-            T data = std::move(queue.front());
+            item = std::move(queue.front());
             queue.pop();
             not_full.notify_one();
-            return data;
+            return true;
         }
 
         bool empty() {
