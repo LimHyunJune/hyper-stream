@@ -1,0 +1,48 @@
+# Build and Release folders
+build/
+bin/
+out/
+lib/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+*.cmake
+!CMakeLists.txt
+Makefile
+install_manifest.txt
+compile_commands.json
+ctest_testfile.cmake
+_deps/
+
+# Verified visual studio and vscode
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.x64
+*.x86
+
+# C++ objects and libs
+*.slo
+*.lo
+*.o
+*.obj
+*.gch
+*.pch
+*.so
+*.dylib
+*.dll
+*.mod
+*.lai
+*.la
+*.a
+*.lib
+*.exe
+*.pdb
+*.ipdb
+*.iobj
