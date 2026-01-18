@@ -25,7 +25,7 @@ public:
 
     bool initialize(
         FilterConfig& config,
-        const vector<shared_ptr<Channel<AVFramePtr>>>& srcChannels,
+        shared_ptr<Channel<AVFramePtr>> srcChannel,  // 단일 입력 채널
         shared_ptr<Channel<AVFramePtr>> dstChannel) override;
     void run() override;
     void stop() override;
@@ -37,7 +37,7 @@ private:
     AVFilterContext* m_sinkContext = nullptr;
     std::vector<AVFilterContext*> m_srcContexts;
 
-    std::vector<shared_ptr<Channel<AVFramePtr>>> m_srcChannels;
+    shared_ptr<Channel<AVFramePtr>> m_srcChannel;  // 단일 입력 채널 (4개 프레임이 순차적으로 옴)
     shared_ptr<Channel<AVFramePtr>> m_dstChannel;
 
     std::atomic<bool> m_running{false};

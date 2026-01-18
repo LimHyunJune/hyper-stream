@@ -16,7 +16,7 @@ public:
 
     virtual bool initialize(
         FilterConfig& config,
-        const vector<shared_ptr<Channel<AVFramePtr>>>& srcChannels,
+        shared_ptr<Channel<AVFramePtr>> srcChannel,  // 단일 입력 채널
         shared_ptr<Channel<AVFramePtr>> dstChannel) = 0;
     virtual void run() = 0;
     virtual void stop() = 0;
