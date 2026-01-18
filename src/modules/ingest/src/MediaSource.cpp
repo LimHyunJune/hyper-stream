@@ -40,7 +40,7 @@ void MediaSource::run()
             if(input_ctx->streams[pkt->stream_index]->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
                 continue;
             BOOST_LOG(debug) << "[INGEST] pts : " << pkt->pts << " dts : " << pkt->dts << " size : " << pkt->size;
-            dst.get()->push(pkt_ptr);
+            dst->push(std::move(pkt_ptr));
         }
 
         else
