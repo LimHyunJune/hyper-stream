@@ -46,7 +46,3 @@ _deps/
 *.pdb
 *.ipdb
 *.iobj
-
-# OS
-.DS_Store
-Thumbs.db

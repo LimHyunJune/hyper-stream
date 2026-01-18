@@ -11,7 +11,7 @@ bool VideoDecoder::initialize(DecoderParam& param, shared_ptr<Channel<AVPacketPt
     }
 
     for (auto stream : param.video_streams) {
-        const AVCodec* codec = nullptr;
+        const AVCodec* codec = nullptr; 
 
         if (stream->codecpar->codec_id == AV_CODEC_ID_HEVC) {
             codec = avcodec_find_decoder_by_name("hevc_nvdec");
