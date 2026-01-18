@@ -1,36 +1,48 @@
 #include "Controller.h"
 #include <vector>
+#include <thread>
+#include "MediaSource.h"
+#include "MediaSink.h"
+#include "VideoDecoder.h"
+#include "VideoEncoder.h"
+#include "MultiviewCompositor.h"
 
 Controller::Controller()
 {
     initialize();
 }
 
+Controller::~Controller() = default;
+
 bool Controller::init_hw_device()
 {
-    hw_device_ctx = av_hwdevice_context_alloc(AV_HWDEVICE_TYPE_CUDA);
-    if(!hw_device_ctx)
+    AVBufferRef* device_ctx = nullptr;
+    int ret = av_hwdevice_ctx_create(&device_ctx, AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0);
+    if(ret < 0)
     {
-        BOOST_LOG(error) << "[CONTROLLER] av_hwdevice_context_alloc failed";
+        BOOST_LOG(error) << "[CONTROLLER] av_hwdevice_ctx_create failed";
         return false;
     }
+    hw_device_ctx = AVBufferPtr(device_ctx, AVMemoryDeleter());
 
-    hw_frames_ctx = av_hwframe_context_alloc(hw_device_ctx);
-    if(!hw_frames_ctx)
+    AVBufferRef* frames_ctx = av_hwframe_ctx_alloc(device_ctx);
+    if(!frames_ctx)
     {
-        BOOST_LOG(error) << "[CONTROLLER] av_hwframe_context_alloc failed";
+        BOOST_LOG(error) << "[CONTROLLER] av_hwframe_ctx_alloc failed";
         return false;
     }
+    hw_frames_ctx = AVBufferPtr(frames_ctx, AVMemoryDeleter());
 
-    AVHWFrameContext* hw_frame_ctx_data = hw_frames_ctx.get()->data;
+    AVHWFramesContext* hw_frame_ctx_data = (AVHWFramesContext*)frames_ctx->data;
     hw_frame_ctx_data->format = AV_PIX_FMT_CUDA;
+    hw_frame_ctx_data->sw_format = AV_PIX_FMT_NV12; 
     hw_frame_ctx_data->width = 3840;
     hw_frame_ctx_data->height = 2160;
     hw_frame_ctx_data->initial_pool_size = 50;
     
-    if(av_hwframe_context_init(hw_frames_ctx) < 0)
+    if(av_hwframe_ctx_init(frames_ctx) < 0)
     {
-        BOOST_LOG(error) << "[CONTROLLER] av_hwframe_context_init failed";
+        BOOST_LOG(error) << "[CONTROLLER] av_hwframe_ctx_init failed";
         return false;
     }
     return true;
@@ -54,7 +66,7 @@ void Controller::initialize()
     sink = make_unique<MediaSink>();
     decoder = make_unique<VideoDecoder>();
     encoder = make_unique<VideoEncoder>();
-    processor = make_unique<VideoProcessor>();
+    processor = make_unique<MultiviewCompositor>();
 
     processor.get()->initialize(param.processor_param, decode_channel, filter_channel);
     encoder.get()->initialize(param.encoder_param, encode_channel, sink);
@@ -66,11 +78,11 @@ void Controller::initialize()
 void Controller::run()
 {
     vector<thread> threads;
-    threads.emplace_back(&MediaSource::run, source.get());
-    threads.emplace_back(&VideoDecoder::run, decoder.get());
-    threads.emplace_back(&VideoProcessor::run, processor.get());
-    threads.emplace_back(&VideoEncoder::run, encoder.get());
-    threads.emplace_back(&MediaSink::run, sink.get());
+    threads.emplace_back(&IMediaSource::run, source.get());
+    threads.emplace_back(&IDecoder::run, decoder.get());
+    threads.emplace_back(&IVideoProcessor::run, processor.get());
+    threads.emplace_back(&IEncoder::run, encoder.get());
+    threads.emplace_back(&IMediaSink::run, sink.get());
 
     for(auto& t : threads)
         t.join();
