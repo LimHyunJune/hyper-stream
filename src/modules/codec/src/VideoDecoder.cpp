@@ -1,7 +1,8 @@
 #include "VideoDecoder.h"
 #include "Logger.h"
+#include "Metadata.h"
 
-bool VideoDecoder::initialize(DecoderParam& param, shared_ptr<Channel<AVPacketPtr>> src, shared_ptr<Channel<AVFramePtr>> dst) {
+bool VideoDecoder::initialize(VideoDecoderParam& param, shared_ptr<Channel<AVPacketPtr>> src, shared_ptr<Channel<AVFramePtr>> dst) {
     this->src = src;
     this->dst = dst;
 
@@ -43,6 +44,7 @@ bool VideoDecoder::initialize(DecoderParam& param, shared_ptr<Channel<AVPacketPt
         if (param.hw_frames_ctx) {
             ctx->hw_frames_ctx = av_buffer_ref(param.hw_frames_ctx.get());
         }
+        ctx->thread_count = 1;
 
         if (avcodec_open2(ctx, codec, nullptr) < 0) {
             BOOST_LOG(error) << "[DECODER] Could not open codec for stream " << stream->index;
@@ -79,14 +81,14 @@ void VideoDecoder::run() {
         
         AVPacket* pkt = pkt_ptr.get();
 
-        if (codec_contexts.find(pkt->stream_index) == codec_contexts.end()) {
+        int idx = pkt->stream_index;
+
+        if (codec_contexts.find(idx) == codec_contexts.end()) {
              // Packet belongs to a stream we aren't decoding (e.g. audio) or failed init
              continue; 
         }
 
-        AVCodecContext* ctx = codec_contexts[pkt->stream_index];
-
-        int ret = avcodec_send_packet(ctx, pkt);
+        int ret = avcodec_send_packet(codec_contexts[idx], pkt);
         if (ret < 0) {
             char errbuf[AV_ERROR_MAX_STRING_SIZE];
             av_strerror(ret, errbuf, AV_ERROR_MAX_STRING_SIZE);
@@ -94,8 +96,11 @@ void VideoDecoder::run() {
             continue;
         }
 
-        while (ret >= 0) {
-            ret = avcodec_receive_frame(ctx, frame);
+        while (true) {
+            AVFramePtr frame_ptr(av_frame_alloc());
+			auto frame = frame_ptr.get();
+
+            ret = avcodec_receive_frame(codec_contexts[idx], frame);
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 break;
             } else if (ret < 0) {
@@ -104,17 +109,10 @@ void VideoDecoder::run() {
                 BOOST_LOG(error) << "[DECODER] Error during decoding: " << errbuf;
                 break;
             }
-            
-            // Create a new AVFrame copy or move mechanism for the shared pointer
-            // Since AVFramePtr uses a unique_ptr with custom deleter, we need to be careful.
-            // initialize creates a NEW frame to pass downstream because avcodec_receive_frame reuses 'frame'
-            
-            AVFrame* new_frame = av_frame_alloc();
-            if(new_frame) {
-                av_frame_move_ref(new_frame, frame); // Move content from reusable 'frame' to 'new_frame'
-                AVFramePtr frame_ptr(new_frame);
-                dst->push(std::move(frame_ptr));
-            }
+
+            frame->opaque = static_cast<void*>(new Metadata{idx});
+            dst->push(std::move(frame_ptr));
+
         }
     }
 

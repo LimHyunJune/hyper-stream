@@ -5,6 +5,9 @@ extern "C"
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
     #include <libavfilter/avfilter.h>
+    #include <libavfilter/buffersink.h>
+	#include <libavfilter/buffersrc.h>
+    #include <libavutil/opt.h>
 }
 
 #include "AVMemory.h"
@@ -19,6 +22,11 @@ struct VideoProcessorParam {
 };
 
 class IVideoProcessor {
+protected:
+    shared_ptr<Channel<AVFramePtr>> src;
+    shared_ptr<Channel<AVFramePtr>> dst;
+    VideoProcessorParam param;
+
 public:
     IVideoProcessor() = default;
     ~IVideoProcessor() = default;

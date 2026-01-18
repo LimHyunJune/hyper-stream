@@ -5,14 +5,12 @@ extern "C" {
     #include <libavutil/opt.h>
 }
 
-bool VideoEncoder::initialize(EncoderParam& param, shared_ptr<Channel<AVFramePtr>> src, shared_ptr<Channel<AVPacketPtr>> dst) {
+bool VideoEncoder::initialize(VideoEncoderParam& param, shared_ptr<Channel<AVFramePtr>> src, shared_ptr<Channel<AVPacketPtr>> dst) {
     this->src = src;
     this->dst = dst;
 
     const AVCodec* codec = nullptr;
-    if (param.encoder_type == EncoderType::HEVC) {
-        codec = avcodec_find_encoder_by_name("hevc_nvenc");
-    }
+    codec = avcodec_find_encoder_by_name("hevc_nvenc");
 
     if (!codec) {
         BOOST_LOG(error) << "[ENCODER] Codec hevc_nvenc not found";
@@ -25,22 +23,22 @@ bool VideoEncoder::initialize(EncoderParam& param, shared_ptr<Channel<AVFramePtr
         return false;
     }
 
-    codec_ctx->width = param.output_config.width;
-    codec_ctx->height = param.output_config.height;
-    codec_ctx->time_base = param.time_base;
-    codec_ctx->framerate = param.frame_rate;
+    codec_ctx->width = param.width;
+    codec_ctx->height = param.height;
+    codec_ctx->time_base = param.timebase;
+    codec_ctx->framerate = param.framerate;
     codec_ctx->pix_fmt = AV_PIX_FMT_CUDA; // Using NVENC, input is likely CUDA frames
 
-    if (param.output_config.bit_rate > 0) {
-        codec_ctx->bit_rate = param.output_config.bit_rate;
+    if (param.bit_rate > 0) {
+        codec_ctx->bit_rate = param.bit_rate;
     }
     
     if (param.hw_device_ctx) {
          codec_ctx->hw_device_ctx = av_buffer_ref(param.hw_device_ctx.get());
     }
 
-    if (param.output_config.hw_frames_ctxs) {
-        codec_ctx->hw_frames_ctx = av_buffer_ref(param.output_config.hw_frames_ctxs.get());
+    if (param.hw_frames_ctx) {
+        codec_ctx->hw_frames_ctx = av_buffer_ref(param.hw_frames_ctx.get());
     }
 
     if (!param.preset.empty()) {

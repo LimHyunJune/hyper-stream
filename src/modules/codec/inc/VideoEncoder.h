@@ -7,7 +7,7 @@ public:
     VideoEncoder() = default;
     ~VideoEncoder() = default;
 
-    virtual bool initialize(EncoderParam& param, shared_ptr<Channel<AVFramePtr>> src, shared_ptr<Channel<AVPacketPtr>> dst) override;
+    virtual bool initialize(VideoEncoderParam& param, shared_ptr<Channel<AVFramePtr>> src, shared_ptr<Channel<AVPacketPtr>> dst) override;
     virtual void run() override;
     virtual void stop() override;
 

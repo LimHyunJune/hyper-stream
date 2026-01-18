@@ -69,9 +69,11 @@ void Controller::initialize()
     processor = make_unique<MultiviewCompositor>();
 
     processor.get()->initialize(param.processor_param, decode_channel, filter_channel);
-    encoder.get()->initialize(param.encoder_param, encode_channel, sink);
+    encoder.get()->initialize(param.encoder_param, filter_channel, encode_channel);
     sink.get()->initialize(param.sink_param, encode_channel);
     source.get()->initialize(param.source_param, ingest_channel);
+
+    param.decoder_param.video_streams = source.get()->get_video_streams();
     decoder.get()->initialize(param.decoder_param, ingest_channel, decode_channel);
 }
 

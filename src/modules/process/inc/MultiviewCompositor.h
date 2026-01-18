@@ -19,6 +19,7 @@ private:
 
     string filter_descr = "";
 
+    bool is_stop = false;
     void make_filter_chain(int idx);
     void make_multiview_compositor();
     void create_filter_graph(int idx);

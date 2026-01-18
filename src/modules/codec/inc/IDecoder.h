@@ -4,7 +4,7 @@
 #include "AVMemory.h"
 #include <vector>
 
-struct DecoderParam {
+struct VideoDecoderParam {
     std::vector<AVStream*> video_streams;
     AVBufferPtr hw_device_ctx;
     AVBufferPtr hw_frames_ctx;
@@ -15,7 +15,7 @@ public:
     IDecoder() = default;
     ~IDecoder() = default;
 
-    virtual bool initialize(DecoderParam& param, shared_ptr<Channel<AVPacketPtr>> src, shared_ptr<Channel<AVFramePtr>> dst) = 0;
+    virtual bool initialize(VideoDecoderParam& param, shared_ptr<Channel<AVPacketPtr>> src, shared_ptr<Channel<AVFramePtr>> dst) = 0;
     virtual void run() = 0;
     virtual void stop() = 0;
 };

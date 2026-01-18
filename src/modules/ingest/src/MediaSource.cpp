@@ -26,6 +26,18 @@ bool MediaSource::initialize(MediaSourceParam& param, shared_ptr<Channel<AVPacke
     return true;
 }
 
+vector<AVStream*> MediaSource::get_video_streams()
+{
+    vector<AVStream*> video_streams;
+    for (unsigned int i = 0; i < input_ctx->nb_streams; i++) {
+        if (input_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            video_streams.push_back(input_ctx->streams[i]);
+        }
+    }
+    return video_streams;
+}
+
+
 void MediaSource::run()
 {
     BOOST_LOG(debug) << "[INGEST] running";

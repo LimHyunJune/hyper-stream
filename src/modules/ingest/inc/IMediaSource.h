@@ -26,6 +26,7 @@ public:
     IMediaSource() = default;
     ~IMediaSource() = default;
 
+    virtual vector<AVStream*> get_video_streams() = 0;
     virtual bool initialize(MediaSourceParam& param, shared_ptr<Channel<AVPacketPtr>> dst) = 0;
     virtual void run() = 0;
     virtual void stop() = 0;

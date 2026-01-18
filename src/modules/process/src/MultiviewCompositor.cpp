@@ -1,4 +1,6 @@
 #include "MultiviewCompositor.h"
+#include "Logger.h"
+#include "Metadata.h"
 
 MultiviewCompositor::~MultiviewCompositor()
 {
@@ -32,11 +34,11 @@ void MultiviewCompositor::create_filter_graph(int idx)
 
     avfilter_graph_create_filter(&buffer_ctxs[idx], avfilter_get_by_name("buffer"), name, args, nullptr, filter_graph);
 
-    AVBufferSrcParameters param;
-    memset(&param, 0, sizeof(param));
-    param.hw_frames_ctx = param.hw_frames_ctx.get();
-    param.format = format;
-    int ret = av_buffersrc_parameters_set(buffer_ctxs[idx], &param);
+    AVBufferSrcParameters buffer_src_param;
+    memset(&buffer_src_param, 0, sizeof(buffer_src_param));
+    buffer_src_param.hw_frames_ctx = param.hw_frames_ctx.get();
+    buffer_src_param.format = format;
+    int ret = av_buffersrc_parameters_set(buffer_ctxs[idx], &buffer_src_param);
     if(ret < 0)
     {
         BOOST_LOG(error) << "[MULTIVIEW_COMPOSITOR] av_buffersrc_parameters_set failed";
@@ -56,7 +58,7 @@ void MultiviewCompositor::make_filter_chain(int idx)
     outputs = out;
 }
 
-bool MultiviewCompositor::initialize(MultiviewCompositorParam& param, shared_ptr<Channel<AVFramePtr>> src, shared_ptr<Channel<AVFramePtr>> dst)
+bool MultiviewCompositor::initialize(VideoProcessorParam& param, shared_ptr<Channel<AVFramePtr>> src, shared_ptr<Channel<AVFramePtr>> dst)
 {
     this->param = param;
     this->src = src;
@@ -73,7 +75,7 @@ bool MultiviewCompositor::initialize(MultiviewCompositorParam& param, shared_ptr
     for(int i = 0; i < 4; i++)
         make_filter_chain(i);
 
-    av_filter_graph_create_filter(&buffersink_ctx, avfilter_get_by_name("buffersink"), "out", nullptr, nullptr, filter_graph);
+    avfilter_graph_create_filter(&buffersink_ctx, avfilter_get_by_name("buffersink"), "out", nullptr, nullptr, filter_graph);
     
     inputs = avfilter_inout_alloc();
     inputs->name = av_strdup("out");
@@ -87,7 +89,7 @@ bool MultiviewCompositor::initialize(MultiviewCompositorParam& param, shared_ptr
         return false;
     }
 
-    if(avfilter_graph_config(filter_graph) < 0)
+    if(avfilter_graph_config(filter_graph, nullptr) < 0)
     {
         BOOST_LOG(error) << "[MULTIVIEW_COMPOSITOR] avfilter_graph_config failed";
         return false;
@@ -104,7 +106,9 @@ void MultiviewCompositor::run()
     {
         auto frame = frame_ptr.get();
 
-        int idx = frame->stream_index;
+        Metadata* meta_data = static_cast<Metadata*>(frame->opaque);
+        int idx = meta_data->stream_index;
+
         int ret = av_buffersrc_add_frame(buffer_ctxs[idx], frame);
         if(ret < 0)
         {
