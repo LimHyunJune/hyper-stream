@@ -1,11 +1,17 @@
 #pragma once
 
+#include "IMediaSource.h"
+
 class MediaSource final : public IMediaSource {
+private:
+    AVFormatContext* input_ctx = nullptr;
+    bool is_stop = false;
+
 public:
     MediaSource() = default;
-    ~MediaSource() = default;
-
-    virtual bool initialize(shared_ptr<Channel<AVPacketPtr>> dst) override;
+    ~MediaSource();
+    
+    virtual bool initialize(MediaSourceParam& param, shared_ptr<Channel<AVPacketPtr>> dst) override;
     virtual void run() override;
     virtual void stop() override;
 };

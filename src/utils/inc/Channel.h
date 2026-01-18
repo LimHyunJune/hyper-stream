@@ -5,6 +5,8 @@ extern "C" {
 	#include <libavcodec/avcodec.h>
 }
 
+#include "AVMemory.h"
+
 #include <queue>
 #include <mutex>
 #include <condition_variable>
